@@ -18,6 +18,8 @@ kdbus$(EXT)-y := \
 obj-m += kdbus$(EXT).o
 
 KERNELDIR 		?= /lib/modules/$(shell uname -r)/build
+MODULESDIR		:= $(shell dirname $(KERNELDIR))
+RELEASESTR		:= $(shell basename $(MODULESDIR))
 PWD			:= $(shell pwd)
 
 all: module test
@@ -38,12 +40,12 @@ check:
 	test/test-kdbus
 
 install: module
-	mkdir -p /lib/modules/$(shell uname -r)/kernel/drivers/kdbus$(EXT)/
-	cp -f kdbus$(EXT).ko /lib/modules/$(shell uname -r)/kernel/drivers/kdbus$(EXT)/
-	depmod $(shell uname -r)
+	mkdir -p $(MODULESDIR)/kernel/drivers/kdbus$(EXT)/
+	cp -f kdbus$(EXT).ko $(MODULESDIR)/kernel/drivers/kdbus$(EXT)/
+	depmod $(RELEASESTR)
 
 uninstall:
-	rm -f /lib/modules/$(shell uname -r)/kernel/drivers/kdbus/kdbus$(EXT).ko
+	rm -f $(MODULESDIR)/kernel/drivers/kdbus/kdbus$(EXT).ko
 
 coccicheck:
 	$(MAKE) -C $(KERNELDIR) M=$(PWD) coccicheck
